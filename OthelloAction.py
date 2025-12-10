@@ -20,7 +20,7 @@ def getAction(board, moves):
         pass
     
     stone_count = sum(1 for row in board for cell in row if cell != 0)
-	current_step = stone_count - 4 + 1
+    current_step = stone_count - 4 + 1
     
 	# 相手ターンの保存
 
