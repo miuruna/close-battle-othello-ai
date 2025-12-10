@@ -17,7 +17,7 @@ class GameLogger:
         base_dir = os.path.dirname(os.path.abspath(__file__))
 
         # TO DO 2: 保存先フォルダの絶対パスをつくる
-        self.log_dir = os.path.join(base_dir, "..", "..",LOG_DIR_NAME)
+        self.log_dir = os.path.join(base_dir, ".." ,LOG_DIR_NAME)
 
         # TO DO 3: フォルダが存在しなかったら作成する
         os.makedirs(self.log_dir, exist_ok=True)
