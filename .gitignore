@@ -1,0 +1,22 @@
+# APIトークン
+.api_token
+
+# コンパイル済のファイル
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 仮想環境
+.venv/
+venv/
+ENV/
+
+# エディタの設定
+.vscode/
+.idea/
+
+# OS固有ファイル
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
