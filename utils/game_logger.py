@@ -12,7 +12,7 @@ LOG_DIR_NAME = "data"
 
 
 class GameLogger:
-    def __init__(self):
+    def __init__(self, board):
         # TO DO 1: このファイルがある場所のパスを取得する
         base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -24,9 +24,14 @@ class GameLogger:
 
         # 途中だった場合に前のファイルから続ける
         latest_file = data_loader.get_latest_modified_file_path(self.log_dir)
-        if data_loader.is_playing(latest_file):
+        if self.count(board) > 5:
             self.filepath = latest_file
             return
+        
+        # 最後の行を取得し書込みをする
+        if latest_file:
+            last_row = data_loader.csv_read(latest_file)[-1]
+            self.save(last_row['step'], "SYSTEM", "GAMEOVER", last_row['board'])
 
         # TO DO 4: ファイル名を決める
         now = datetime.now()
@@ -36,7 +41,7 @@ class GameLogger:
         self.filepath = os.path.join(self.log_dir, filename)
 
         # TO DO 5: ヘッダーのリストを定義
-        self.headers = ["timestamp", "step", "turn", "status", "board", "action"]
+        self.headers = ["timestamp", "step", "turn", "status", "board", "action", "opp_model"]
 
         # TO DO 6: ファイルを新規作成してヘッダーを書き込むメソッドを呼ぶ
         self._init_csv()
@@ -48,7 +53,7 @@ class GameLogger:
             writer = csv.writer(f)
             writer.writerow(self.headers)
 
-    def save(self, step, turn, status, board, action=None):
+    def save(self, step, turn, status, board, action=None, opp_model=None):
         """
         対戦状況を1行追記する
         
@@ -74,7 +79,7 @@ class GameLogger:
         # TO DO 11 self.filepath を "a"で開き1行書き込む
         with open(self.filepath, 'a') as f:
             writer = csv.writer(f)
-            row = [now_timestamp, step, turn, status, board_str, action_str]
+            row = [now_timestamp, step, turn, status, board_str, action_str, opp_model]
             writer.writerow(row)
 
         print(f"Log saved: Step{step} ({status})")
@@ -130,6 +135,14 @@ class GameLogger:
                 if prev_board[r][c] == 0 and new_board[r][c] != 0:
                     action = [r, c]
         return action
+    
+    def count(self, board):
+        count = 0
+        for row in board:
+            for cell in row:
+                if cell != 0:
+                    count += 1
+        return count
 
 
 

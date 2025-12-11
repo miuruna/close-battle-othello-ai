@@ -14,7 +14,7 @@ def getAction(board, moves):
     
     # 1. ロガーの初期化（初回のみ）
     if _logger is None:
-        _logger = GameLogger()
+        _logger = GameLogger(board)
         _my_color, _opp_color = _logger.initial_save(board)
     else:
         pass
