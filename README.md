@@ -3,13 +3,14 @@
 Othello Arena 用の Python プログラムに監視システムを追加したもの
 
 Othello Arena用のPythonプログラム: https://github.com/KousukeIshii/OthelloArenaPython
+## [仕様書](docs/SPECIFICATION.md)
 
 ## 実行方法
 インストールが必要なライブラリは`requirments.txt`にあるため仮想環境を作成してインストールすること
 
 ### オセロAIのみを実行する
 ```bash
-python othello_arena/Play.py
+python Play.py
 ```
 ### ダッシュボードのみを実行する
 ```bash
@@ -33,10 +34,9 @@ python run.py
 #### `utils`
 必要な関数が入ったディレクトリです
 
-### othello_arena
-#### `OthelloAction.py`
+### `OthelloAction.py`
 AIオセロでは基本的にこの部分を操作することになる
-##### `getAction(board, moves, step, my_turn, logger:GameLogger)`
+#### `getAction(board, moves, step, my_turn, logger:GameLogger)`
 | 列名 | 概要 |
 | --- | --- |
 | board | 盤面に関するデータ |
