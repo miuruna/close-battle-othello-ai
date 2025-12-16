@@ -26,6 +26,7 @@ class GameLogger:
         rand_str = ''.join([random.choice(string.ascii_letters) for i in range(4)])
         filename = f"log_{now_str}_{rand_str}.csv"
         self.filepath = os.path.join(self.log_dir, filename)
+        self._init_csv()
 
     def resume_log(self, filepath):
         self.filepath = filepath

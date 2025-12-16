@@ -1,5 +1,6 @@
 import random
 import OthelloLogic
+from utils import data_loader
 from utils.ai_state_manager import AiStateManager
 from utils.bayes_player import BayesPlayer
 from utils.game_logger import GameLogger
@@ -40,6 +41,9 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
             else:
                 _my_color, _opp_color = "white", "black"
             _logger.initial_save(board, _my_color)
+        else:
+            file_path = data_loader.get_latest_modified_file_path("/data")
+            _logger.resume_log(file_path)
 
     # 初回のみ実施される
     if _ai_memory is None:
