@@ -7,7 +7,7 @@ class GameInfo:
     def __init__(self):
         self.turn_count: int = 0
         self.my_color: str | None = None
-        self.board: list | None = None
+        self.board: list[list[int]] | None = None
 
 class AiStateManager:
     def __init__(self):
