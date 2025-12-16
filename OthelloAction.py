@@ -1,6 +1,7 @@
 import random
 import OthelloLogic
 from utils.ai_state_manager import AiStateManager
+from utils.bayes_player import BayesPlayer
 from utils.game_logger import GameLogger
 
 # ロガーをグローバル変数として保持（プログラム実行中ずっと維持するため）
@@ -8,12 +9,23 @@ _logger = None
 _my_color = None
 _opp_color = None
 _ai_memory = None
+_bayes_player = None
 
-def getAction(board:list, moves):
+def getAction(board:list[list[int]], moves:list[list[int]]):
+    """
+    次に打つ手を取得する関数
+    
+    :param board: 現在の盤面
+    :type board: list[list[int]]
+    :param moves: 現在の盤面における合法手のリスト
+    :type moves: list[list[int]]
+    """
+    
     global _logger
     global _my_color
     global _opp_color
     global _ai_memory
+    global _bayes_player
 
     stone_count = stone_counter(board)
 
@@ -44,42 +56,72 @@ def getAction(board:list, moves):
             else:
                 _opp_color = "black"
 
-    # ひとつ前の盤面を取得
-    prev_board = _ai_memory.game_info.board
+    # 初回のみ実施される
+    if _bayes_player is None:
+        _bayes_player = BayesPlayer()
 
-    if stone_count != 4:
+    # ひとつ前の盤面を取得
+    prev_board:list[list[int]] | None = _ai_memory.game_info.board
+
+    opp_move = None
+
+    if stone_count != 4 and prev_board is not None:
         # 相手の打った手を取得
         opp_move = get_opp_action(prev_board, board)
-        _logger.save(stone_count - 4, _opp_color, "MOVED", board, opp_move, _ai_memory.opponent_model)
 
+    if opp_move is not None and prev_board is not None:
+        # 相手のモデルを更新
+        _ai_memory.opponent_model = _bayes_player.update_opponent_model(prev_board, opp_move, _ai_memory.opponent_model)
+
+    # CSVに相手の手を書き込む
+    _logger.save(stone_count - 4, _opp_color, "MOVED", board, opp_move, _ai_memory.opponent_model)
+
+    # CSVに思考開始を記録する
     _logger.save(stone_count - 3, _my_color, "THINKING", board, None, _ai_memory.opponent_model)
 
-    # 自分の手を決定する
+    # -----自分の手を決定する-----
     next_move = random.choice(moves)
+    # ---------------------------
 
     # 盤面を取得
     next_board = OthelloLogic.execute(board, next_move, 1, len(board))
 
+    # 自分の手をCSVに保存する
     _logger.save(stone_count - 3, _my_color, "MOVED", next_board, next_move, _ai_memory.opponent_model)
     
+    # JSONにバックアップをとる
     _ai_memory.game_info.board = next_board
     _ai_memory.game_info.turn_count = stone_count - 3
     _ai_memory.save_json()
 
     return next_move
 
-def stone_counter(board:list):
-	count = 0
-	for row in board:
-		for cell in row:
-			if cell != 0:
-				count += 1
-	return count
+def stone_counter(board:list[list[int]]):
+    """
+    盤上にある石の数を数える
+    
+    :param board: 盤面
+    :type board: list[list[int]]
+    """
+    count = 0
+    for row in board:
+        for cell in row:
+            if cell != 0:
+                count += 1
+    return count
 
 def is_new(board):
 	return not (stone_counter(board) > 5)
 
-def get_opp_action(prev_board, board):
+def get_opp_action(prev_board:list[list[int]], board:list[list[int]]):
+    """
+    前の盤面と現在の盤面の差分から相手の打った手を取得する
+    
+    :param prev_board: 前の盤面
+    :type prev_board: list[list[int]]
+    :param board: 現在の盤面
+    :type board: list[list[int]]
+    """
     if stone_counter(board) - stone_counter(prev_board) != 1:
         opp_move = None
     else:
