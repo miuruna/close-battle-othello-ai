@@ -125,22 +125,7 @@ class GameLogger:
                     row.append(0)
             initial_board.append(row)
         return initial_board
-    
-    def get_action(self, prev_board, new_board):
-        action = None
-        for r in range(len(new_board)):
-            for c in range(len(new_board)):
-                if prev_board[r][c] == 0 and new_board[r][c] != 0:
-                    action = [r, c]
-        return action
-    
-    def count(self, board):
-        count = 0
-        for row in board:
-            for cell in row:
-                if cell != 0:
-                    count += 1
-        return count
+
 
 
 
