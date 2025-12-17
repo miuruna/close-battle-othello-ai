@@ -1,3 +1,4 @@
+import copy
 import random
 import OthelloLogic
 import numpy as np
@@ -93,7 +94,8 @@ class BayesPlayer:
         preferences:list[float] = []
         mobility = len(moves)
         for move in moves:
-            preference = self.get_move_preference(move, board, beta, evaluate_func, mobility)
+            expect_board = OthelloLogic.execute(copy.deepcopy(board), move, -1, len(board))
+            preference = self.get_move_preference(move, expect_board, beta, evaluate_func, mobility) # type: ignore
             preferences.append(preference)
         # softmax関数で確率密度に変換
         probabilities:np.ndarray = softmax(np.array(preferences))
