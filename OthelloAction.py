@@ -1,6 +1,6 @@
 import random
 import OthelloLogic
-from utils import data_loader
+from utils import bayes_even, data_loader
 from utils.ai_state_manager import AiStateManager
 from utils.bayes_player import BayesPlayer
 from utils.game_logger import GameLogger
@@ -90,7 +90,7 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
     _logger.save(stone_count - 3, _my_color, "THINKING", board, None, _ai_memory.opponent_model)
 
     # -----自分の手を決定する-----
-    next_move = random.choice(moves)
+    next_move = bayes_even.bayes_even(board, moves, stone_count - 3, _ai_memory.opponent_model, _bayes_player, _evaluator.evaluate)
     # ---------------------------
 
     # 盤面を取得
