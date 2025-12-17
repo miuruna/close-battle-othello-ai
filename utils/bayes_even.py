@@ -14,9 +14,9 @@ import math
 from utils import bayes_player
 import copy
 
-TARGET_MID = 10      # 中盤：接戦を作る目標評価値
-TARGET_END = 100     # 終盤：勝利を目指す目標評価値
-ENDGAME_TURN = 50    # 終盤とみなすターン数
+TARGET_MID = 100      # 中盤：接戦を作る目標評価値
+TARGET_END = 1000     # 終盤：勝利を目指す目標評価値
+ENDGAME_TURN = 36    # 終盤とみなすターン数
 MAX_DEPTH = 3        # 探索の深さ
 
 
