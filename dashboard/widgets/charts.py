@@ -1,16 +1,23 @@
 import streamlit as st
-from utils import calculator
 import altair as alt
 import pandas as pd
+from utils import calculator, OthelloLogic, evaluator
+import json
+
 
 def draw_trend_graph(record_list, my_color="black"):
+    ev = evaluator.Evaluator()
     if not record_list:
         st.warning("グラフ表示用のデータがありません")
         return 
 
     chart_data = []
+    
     for i, row in enumerate(record_list):
-        score = calculator.calculate_metric(row['board'], my_color)
+        board_list = json.loads(row['board'])
+        player = 1 if row['turn'] == my_color else -1
+        moves = OthelloLogic.getMoves(board_list, player, len(board_list))
+        score = ev.evaluate(board_list, player)
         chart_data.append({
             "step": i,
             "score": score
