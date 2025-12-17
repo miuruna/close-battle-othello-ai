@@ -4,6 +4,7 @@ from utils import data_loader
 from utils.ai_state_manager import AiStateManager
 from utils.bayes_player import BayesPlayer
 from utils.game_logger import GameLogger
+from utils.Evaluator import Evaluator
 
 # ロガーをグローバル変数として保持（プログラム実行中ずっと維持するため）
 _logger = None
