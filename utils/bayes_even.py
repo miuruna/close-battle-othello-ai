@@ -12,6 +12,7 @@ import OthelloAction
 import OthelloLogic
 import math
 from utils import bayes_player
+import copy
 
 TARGET_MID = 10      # 中盤：接戦を作る目標評価値
 TARGET_END = 100     # 終盤：勝利を目指す目標評価値
@@ -34,7 +35,8 @@ def bayes_even(board, moves, turn, opponent_model, bayes_player, evaluate_func):
     best_move = None
 
     for move in moves:
-        next_board = OthelloLogic.execute(board, move, 1, len(board))
+        tmp_board = copy.deepcopy(board)
+        next_board = OthelloLogic.execute(tmp_board, move, 1, len(board))
         predict_score = search (next_board, MAX_DEPTH, False, turn + 1, opponent_model, bayes_player, evaluate_func)
         
         if turn >= ENDGAME_TURN:
@@ -68,9 +70,9 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
     if is_my_turn:
         # 自分のターン
         if turn >= 50:
-             target = 1000
+            target = 1000
         else:
-             target = 100
+            target = 100
 
         #接戦にしたい評価値
         #評価値が0~100の時
@@ -80,9 +82,10 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
 
         
         for move in moves:
-            new_board = OthelloLogic.execute(board, move, player, len(board))
+            tmp_board = copy.deepcopy(board)
+            new_board = OthelloLogic.execute(tmp_board, move, player, len(board))
             score = search(new_board, depth-1, False, turn + 1, opponent_model, bayes_player, evaluate_func)
-            diff = abs(score - target)
+            diff = abs(score - target) # type: ignore
 
             if diff < best_diff:
                 best_diff = diff
