@@ -12,6 +12,7 @@ _my_color = None
 _opp_color = None
 _ai_memory = None
 _bayes_player = None
+_evaluator = None
 
 def getAction(board:list[list[int]], moves:list[list[int]]):
     """
@@ -28,6 +29,7 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
     global _opp_color
     global _ai_memory
     global _bayes_player
+    global _evaluator
 
     stone_count = stone_counter(board)
 
@@ -65,6 +67,9 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
     if _bayes_player is None:
         _bayes_player = BayesPlayer()
 
+    if _evaluator is None:
+        _evaluator = Evaluator()
+
     # ひとつ前の盤面を取得
     prev_board:list[list[int]] | None = _ai_memory.game_info.board
 
@@ -76,7 +81,7 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
 
     if opp_move is not None and prev_board is not None:
         # 相手のモデルを更新
-        _ai_memory.opponent_model = _bayes_player.update_opponent_model(prev_board, opp_move, _ai_memory.opponent_model)
+        _ai_memory.opponent_model = _bayes_player.update_opponent_model(prev_board, opp_move, _ai_memory.opponent_model, _evaluator.evaluate)
 
     # CSVに相手の手を書き込む
     _logger.save(stone_count - 4, _opp_color, "MOVED", board, opp_move, _ai_memory.opponent_model)
