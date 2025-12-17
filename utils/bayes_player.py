@@ -6,7 +6,7 @@ from utils import alpha_beta_search
 
 BETA_CANDIDATES = [0.0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.2]
 
-DEPTH = 1
+DEPTH = 0
 
 class BayesPlayer:
     def update_opponent_model(self, prev_board: list[list[int]], move: list[int], opponent_model: list[float], evaluate_func):
