@@ -14,18 +14,39 @@ class Evaluator:
         self.weights = POSITION_TABLE
         
     def calc_board_position(self, board, color):
-        pass
-
+        score = 0
+        for x in range(8):
+            for y in range(8):
+                score += board[x][y] * self.weights[x][y] * color
+        return score
     def calc_confirmed_stones(self, board, color):
-        pass
+        score = 0
+        if board[0][0] == color:
+            score += 1
+        elif board[0][0] == -color:
+            score -= 1
+        
+        if board[7][0] == color:
+            score += 1
+        elif board[7][0] == -color:
+            score -= 1
+        
+        if board[0][7] == color:
+            score += 1
+        elif board[0][7] == -color:
+            score -= 1
+        
+        if board[7][7] == color:
+            score += 1
+        elif board[7][7] == -color:
+            score -= 1
+        
+        return score
 
-    def calc_mobility(self, board, color):
-        pass
 
-    def evaluate(self, board, color):
+    def evaluate(self, board, color, mobility):
         bp = self.calc_board_position(board, color)
         cs = self.calc_confirmed_stones(board, color)
-        nc = self.calc_mobility(board, color)
 
-        return bp * 1 + cs * 10 + nc * 2
+        return bp * 1 + cs * 10 + mobility * 2
         
