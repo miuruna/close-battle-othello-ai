@@ -56,7 +56,7 @@ def get_latest_score(file_path):
     
     latest_data = data_list[-1]
     my_color = data_loader.get_my_color(file_path)
-    return count_stones(latest_data['board'], my_color)
+    return count_stones(latest_data['board'], my_color) # type: ignore
 
 # 試合が実行中かどうかを返す関数
 def is_playing(file_path) -> bool:

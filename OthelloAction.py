@@ -1,10 +1,10 @@
-import random
 import OthelloLogic
 from utils import bayes_even, data_loader
 from utils.ai_state_manager import AiStateManager
 from utils.bayes_player import BayesPlayer
 from utils.game_logger import GameLogger
 from utils.Evaluator import Evaluator
+import copy
 
 # ロガーをグローバル変数として保持（プログラム実行中ずっと維持するため）
 _logger = None
@@ -72,6 +72,8 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
 
     # ひとつ前の盤面を取得
     prev_board:list[list[int]] | None = _ai_memory.game_info.board
+    print("ひとつ前の盤面")
+    print(prev_board)
 
     opp_move = None
 
@@ -79,9 +81,17 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
         # 相手の打った手を取得
         opp_move = get_opp_action(prev_board, board)
 
+    print("相手が打った手")
+    print(opp_move)
+    if opp_move is None:
+        print("相手の手を取得できませんでした")
+
     if opp_move is not None and prev_board is not None:
         # 相手のモデルを更新
-        _ai_memory.opponent_model = _bayes_player.update_opponent_model(prev_board, opp_move, _ai_memory.opponent_model, _evaluator.evaluate)
+        _ai_memory.opponent_model = _bayes_player.update_opponent_model(copy.deepcopy(prev_board), opp_move, _ai_memory.opponent_model, _evaluator.evaluate)
+
+    # 更新されたモデル
+    print(_ai_memory.opponent_model)
 
     # CSVに相手の手を書き込む
     _logger.save(stone_count - 4, _opp_color, "MOVED", board, opp_move, _ai_memory.opponent_model)
@@ -90,7 +100,7 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
     _logger.save(stone_count - 3, _my_color, "THINKING", board, None, _ai_memory.opponent_model)
 
     # -----自分の手を決定する-----
-    next_move = bayes_even.bayes_even(board, moves, stone_count - 3, _ai_memory.opponent_model, _bayes_player, _evaluator.evaluate)
+    next_move = bayes_even.bayes_even(copy.deepcopy(board), moves, stone_count - 3, _ai_memory.opponent_model, _bayes_player, _evaluator.evaluate)
     # ---------------------------
 
     # 盤面を取得
@@ -100,7 +110,7 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
     _logger.save(stone_count - 3, _my_color, "MOVED", next_board, next_move, _ai_memory.opponent_model)
     
     # JSONにバックアップをとる
-    _ai_memory.game_info.board = next_board
+    _ai_memory.game_info.board = copy.deepcopy(next_board)
     _ai_memory.game_info.turn_count = stone_count - 3
     _ai_memory.save_json()
 
