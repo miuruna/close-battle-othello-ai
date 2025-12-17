@@ -13,42 +13,55 @@ LOG_DIR_NAME = "data"
 
 class GameLogger:
     def __init__(self):
-        # TO DO 1: このファイルがある場所のパスを取得する
         base_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # TO DO 2: 保存先フォルダの絶対パスをつくる
-        self.log_dir = os.path.join(base_dir, ".." ,LOG_DIR_NAME)
-
-        # TO DO 3: フォルダが存在しなかったら作成する
+        self.log_dir = os.path.join(base_dir, "..", LOG_DIR_NAME)
         os.makedirs(self.log_dir, exist_ok=True)
 
-        # 途中だった場合に前のファイルから続ける
-        latest_file = data_loader.get_latest_modified_file_path(self.log_dir)
-        if data_loader.is_playing(latest_file):
-            self.filepath = latest_file
-            return
+        self.filepath = None
+        self.headers = ["timestamp", "step", "turn", "status", "board", "action", "opp_model"]
 
-        # TO DO 4: ファイル名を決める
+    def create_new_log(self):
         now = datetime.now()
         now_str = now.strftime('%Y-%m-%d_%H%M%S')
         rand_str = ''.join([random.choice(string.ascii_letters) for i in range(4)])
         filename = f"log_{now_str}_{rand_str}.csv"
         self.filepath = os.path.join(self.log_dir, filename)
-
-        # TO DO 5: ヘッダーのリストを定義
-        self.headers = ["timestamp", "step", "turn", "status", "board", "action"]
-
-        # TO DO 6: ファイルを新規作成してヘッダーを書き込むメソッドを呼ぶ
         self._init_csv()
-    
+
+    def resume_log(self, filepath):
+        self.filepath = filepath
+        print(f"Resuming log: {self.filepath}")
+
+    def finalize_previous_log(self):
+        csv_files = glob(os.path.join(self.log_dir, "*.csv"))
+        if not csv_files:
+            return
+        latest_file = max(csv_files, key=os.path.getctime)
+
+        try:
+            with open(latest_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            if lines and "GAMEOVER" not in lines[-1]:
+                with open(latest_file, 'a', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    now_ts = datetime.now().strftime('%H:%M:%S.&f')
+                    writer.writerow([now_ts, "SYSTEM", "END", "GAMEOVER", "", "", ""])
+                print(f"Finalized previous log: {latest_file}")
+        except Exception as e:
+            print(f"Error finalizing log: {e}")
+
     # ファイルを生成しヘッダーを書き込む
     def _init_csv(self):
+        if self.filepath is None:
+            return
         # TO DO 7: self.filepath を "w" で開き self.headers を書き込む
-        with open(self.filepath, 'w') as f:
+        with open(self.filepath, 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow(self.headers)
 
-    def save(self, step, turn, status, board, action=None):
+
+    def save(self, step, turn, status, board, action=None, opp_model=None):
         """
         対戦状況を1行追記する
         
@@ -58,6 +71,9 @@ class GameLogger:
         :param board: 盤面の2次元配列
         :param action: 打った場所[x, y] (ない場合はNone)
         """
+
+        if self.filepath is None:
+            return
 
         # TO DO 8 現在時刻の文字列を取得する
         now_timestamp = datetime.now().strftime('%H:%M:%S.%f')
@@ -71,37 +87,24 @@ class GameLogger:
         else:
             action_str = ""
 
+        if opp_model:
+            opp_model_str = json.dumps(opp_model)
+        else:
+            opp_model_str = ""
+
         # TO DO 11 self.filepath を "a"で開き1行書き込む
-        with open(self.filepath, 'a') as f:
+        with open(self.filepath, 'a', newline='') as f:
             writer = csv.writer(f)
-            row = [now_timestamp, step, turn, status, board_str, action_str]
+            row = [now_timestamp, step, turn, status, board_str, action_str, opp_model_str]
             writer.writerow(row)
 
         print(f"Log saved: Step{step} ({status})")
 
-    def initial_save(self, board, action=None):
-        # 先攻か後攻か
-        count = 0
-        for row in board:
-            for cell in row:
-                if cell != 0:
-                    count += 1
-        if count % 2 == 0:
-            my_turn, opp_turn = "black", "white"
-        else:
-            my_turn, opp_turn = "white", "black"
-        
+    def initial_save(self, board, my_turn):
         initial_board = self.get_initial_board(board, my_turn)
-
         # 初期データの保存
         self.save(0, "SYSTEM", "INITIAL", initial_board)
-
-        if count % 2 != 0:
-            # action を探す
-            action = self.get_action(initial_board, board)
-            self.save(1, "black", "MOVED", board, action)
-        
-        return my_turn, opp_turn
+        return
 
     def get_initial_board(self, board, my_turn):
         size = len(board)
@@ -122,14 +125,7 @@ class GameLogger:
                     row.append(0)
             initial_board.append(row)
         return initial_board
-    
-    def get_action(self, prev_board, new_board):
-        action = None
-        for r in range(len(new_board)):
-            for c in range(len(new_board)):
-                if prev_board[r][c] == 0 and new_board[r][c] != 0:
-                    action = [r, c]
-        return action
+
 
 
 

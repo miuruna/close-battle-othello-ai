@@ -15,7 +15,7 @@ def execute(board,action,player,size):
         for dir in dirs:
             bool,flips = executeFlip(board,player,action[1],action[0],dir,size)
             if(bool):
-                for flip in flips:
+                for flip in flips: # type: ignore
                     board[flip[0]][flip[1]] = player
         return board
     
