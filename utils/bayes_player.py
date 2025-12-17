@@ -115,7 +115,18 @@ class BayesPlayer:
         preference = score * beta
         return preference
 
-# softmax関数
-def softmax(x:np.ndarray):
-    exp_x = np.exp(x)
-    return exp_x / np.sum(exp_x)
+def softmax(x: np.ndarray):
+    # NaN や inf を除去
+    x = np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0)
+
+    # 最大値を引いてオーバーフロー防止
+    max_x = np.max(x)
+    exp_x = np.exp(x - max_x)
+
+    sum_exp = np.sum(exp_x)
+
+    # 全部0なら一様分布にする
+    if sum_exp == 0:
+        return np.ones(len(x)) / len(x)
+
+    return exp_x / sum_exp
