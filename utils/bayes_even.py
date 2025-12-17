@@ -11,7 +11,7 @@
 import OthelloAction
 import OthelloLogic
 import math
-import BayesPlayer
+from utils import bayes_player
 
 TARGET_MID = 10      # 中盤：接戦を作る目標評価値
 TARGET_END = 100     # 終盤：勝利を目指す目標評価値
@@ -29,7 +29,7 @@ def simulate_move(board, move, player):
 
     return new_board
 
-def bayes_even(board, moves, turn, opponent_model, bayes_player: BayesPlayer, evaluate_func):
+def bayes_even(board, moves, turn, opponent_model, bayes_player, evaluate_func):
     best_diff = math.inf
     best_move = None
 
@@ -42,7 +42,7 @@ def bayes_even(board, moves, turn, opponent_model, bayes_player: BayesPlayer, ev
         else:
             target = TARGET_MID
         
-        diff = predict_score - target
+        diff = abs(predict_score - target)
 
         if diff < best_diff:
             best_diff = diff
@@ -55,14 +55,15 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
     
     player = 1 if is_my_turn else -1
     
-    moves = OthelloLogic.getMoves(board, player, size)
+    
     size = len(board)
+    moves = OthelloLogic.getMoves(board, player, size)
 
     if depth == 0 or OthelloAction.stone_counter(board) > 63:
         return evaluate_func(board, player, len(moves))
     
     if len(moves) == 0:
-        return search(board, depth-1, not is_my_turn, turn+1, opponent_model)
+        return search(board, depth-1, not is_my_turn, turn+1, opponent_model, bayes_player, evaluate_func)
     
     if is_my_turn:
         # 自分のターン
@@ -95,7 +96,7 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
         expected_score = 0
         for i in range(len(moves)):
             move = moves[i]
-            if probabilities[i] < 0.5:
+            if probabilities[i] <= 0:
                 continue
             next_board = OthelloLogic.execute(board, move, player, len(board))
             score = search(next_board, depth-1, True, turn + 1, opponent_model, bayes_player, evaluate_func)
