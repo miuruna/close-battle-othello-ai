@@ -5,7 +5,7 @@ import numpy as np
 BETA_CANDIDATES = [0.0, 0.1, 0.3, 0.6, 1.2, 2.5, 5.0, 15.0]
 
 class BayesPlayer:
-    def update_opponent_model(self, prev_board: list[list[int]], move: list[int], opponent_model: list[float]):
+    def update_opponent_model(self, prev_board: list[list[int]], move: list[int], opponent_model: list[float], evaluate_func):
         """
         相手の強さのモデルを更新する
         
@@ -35,7 +35,7 @@ class BayesPlayer:
         for i in range(len(BETA_CANDIDATES)):
             beta = BETA_CANDIDATES[i]
             # 特定のβに対する確率分布
-            probabilities:np.ndarray = self.get_moves_probabilities(candidate_moves, prev_board, beta)
+            probabilities:np.ndarray = self.get_moves_probabilities(candidate_moves, prev_board, beta, evaluate_func)
             # 実際に打たれた手の尤度を記録
             likelihood.append(probabilities[move_index])
         
@@ -60,7 +60,7 @@ class BayesPlayer:
 
         return new_opponent_model
 
-    def get_moves_predict(self, moves:list[list[int]], board:list[list[int]], opponent_model: list[float]):
+    def get_moves_predict(self, moves:list[list[int]], board:list[list[int]], opponent_model: list[float], evaluate_func):
         """
         それぞれの手を打つ可能性を求める関数
         
@@ -75,11 +75,11 @@ class BayesPlayer:
         for i in range(len(BETA_CANDIDATES)):
             beta = BETA_CANDIDATES[i]
             confidence_score = opponent_model[i]
-            probabilities:np.ndarray = self.get_moves_probabilities(moves, board, beta)
+            probabilities:np.ndarray = self.get_moves_probabilities(moves, board, beta, evaluate_func)
             predict = predict + probabilities * confidence_score
         return  predict.tolist()
 
-    def get_moves_probabilities(self, moves:list[list[int]], board:list[list[int]], beta:float):
+    def get_moves_probabilities(self, moves:list[list[int]], board:list[list[int]], beta:float, evaluate_func):
         """
         相手の強さをβと仮定したときの各手を打ちうる確率
         
@@ -91,14 +91,15 @@ class BayesPlayer:
         :type beta: float
         """
         preferences:list[float] = []
+        mobility = len(moves)
         for move in moves:
-            preference = self.get_move_preference(move, board, beta)
+            preference = self.get_move_preference(move, board, beta, evaluate_func, mobility)
             preferences.append(preference)
         # softmax関数で確率密度に変換
         probabilities:np.ndarray = softmax(np.array(preferences))
         return probabilities
 
-    def get_move_preference(self, move:list[int], board: list[list[int]], beta: float):
+    def get_move_preference(self, move:list[int], board: list[list[int]], beta: float, evaluate_func, mobility):
         """
         ある手に対してその手を打つ可能性
         
@@ -109,13 +110,10 @@ class BayesPlayer:
         :param beta: 相手の強さβ
         :type beta: float
         """
-        score = evaluate()
+
+        score = evaluate_func(board, -1, mobility)
         preference = score * beta
         return preference
-
-# モック関数
-def evaluate():
-    return random.uniform(-1, 1)
 
 # softmax関数
 def softmax(x:np.ndarray):
