@@ -17,7 +17,7 @@ import copy
 TARGET_MID = 10      # 中盤：接戦を作る目標評価値
 TARGET_END = 100     # 終盤：勝利を目指す目標評価値
 ENDGAME_TURN = 50    # 終盤とみなすターン数
-MAX_DEPTH = 2        # 探索の深さ
+MAX_DEPTH = 3        # 探索の深さ
 
 
 
@@ -62,7 +62,9 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
     moves = OthelloLogic.getMoves(board, player, size)
 
     if depth == 0 or OthelloAction.stone_counter(board) > 63:
-        return evaluate_func(board, player, len(moves))
+        target_color = 1
+        mobility = len(moves) if is_my_turn else -len(moves)
+        return evaluate_func(board, target_color, mobility)
     
     if len(moves) == 0:
         return search(board, depth-1, not is_my_turn, turn+1, opponent_model, bayes_player, evaluate_func)
@@ -101,7 +103,8 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
             move = moves[i]
             if probabilities[i] <= 0:
                 continue
-            next_board = OthelloLogic.execute(board, move, player, len(board))
+            tmp_board = copy.deepcopy(board)
+            next_board = OthelloLogic.execute(tmp_board, move, player, len(board))
             score = search(next_board, depth-1, True, turn + 1, opponent_model, bayes_player, evaluate_func)
 
             expected_score += probabilities[i] * score

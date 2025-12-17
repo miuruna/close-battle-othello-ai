@@ -1,9 +1,12 @@
 import copy
-import random
+import math
 import OthelloLogic
 import numpy as np
+from utils import alpha_beta_search
 
 BETA_CANDIDATES = [0.0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.2]
+
+DEPTH = 1
 
 class BayesPlayer:
     def update_opponent_model(self, prev_board: list[list[int]], move: list[int], opponent_model: list[float], evaluate_func):
@@ -112,8 +115,11 @@ class BayesPlayer:
         :param beta: 相手の強さβ
         :type beta: float
         """
+        
+        a = - math.inf
+        b = math.inf
 
-        score = evaluate_func(board, -1, mobility)
+        score = alpha_beta_search.alpha_beta_search(copy.deepcopy(board), DEPTH, a, b, False, -1, evaluate_func)
         preference = score * beta
         return preference
 
