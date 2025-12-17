@@ -45,7 +45,7 @@ def getAction(board:list[list[int]], moves:list[list[int]]):
                 _my_color, _opp_color = "white", "black"
             _logger.initial_save(board, _my_color)
         else:
-            file_path = data_loader.get_latest_modified_file_path("/data")
+            file_path = data_loader.get_latest_modified_file_path("data/")
             _logger.resume_log(file_path)
 
     # 初回のみ実施される
