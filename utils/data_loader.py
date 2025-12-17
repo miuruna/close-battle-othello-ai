@@ -25,7 +25,7 @@ def csv_read(file_path):
         return l
     except Exception:
         return []
-    
+
 # 試合が実行中かどうかを返す関数
 def is_playing(file_path) -> bool:
     if file_path is None:
