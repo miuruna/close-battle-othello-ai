@@ -2,7 +2,7 @@ import random
 import OthelloLogic
 import numpy as np
 
-BETA_CANDIDATES = [0.0, 0.1, 0.3, 0.6, 1.2, 2.5, 5.0, 15.0]
+BETA_CANDIDATES = [0.0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.2]
 
 class BayesPlayer:
     def update_opponent_model(self, prev_board: list[list[int]], move: list[int], opponent_model: list[float], evaluate_func):

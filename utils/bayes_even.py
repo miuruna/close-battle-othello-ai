@@ -68,9 +68,9 @@ def search(board, depth, is_my_turn: bool, turn, opponent_model, bayes_player, e
     if is_my_turn:
         # 自分のターン
         if turn >= 50:
-             target = 100
+             target = 1000
         else:
-             target = 10
+             target = 100
 
         #接戦にしたい評価値
         #評価値が0~100の時
