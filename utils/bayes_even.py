@@ -17,7 +17,7 @@ import copy
 TARGET_MID = 100      # 中盤：接戦を作る目標評価値
 TARGET_END = 1000     # 終盤：勝利を目指す目標評価値
 ENDGAME_TURN = 36    # 終盤とみなすターン数
-MAX_DEPTH = 3        # 探索の深さ
+MAX_DEPTH = 4        # 探索の深さ
 
 
 
