@@ -1,7 +1,7 @@
 import os
 import json
 
-INITIAL_MODEL = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+INITIAL_MODEL = [0.25, 0.25, 0.25, 0.25]
 
 class GameInfo:
     def __init__(self):
