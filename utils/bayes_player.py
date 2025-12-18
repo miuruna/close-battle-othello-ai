@@ -4,9 +4,10 @@ import OthelloLogic
 import numpy as np
 from utils import alpha_beta_search
 
-BETA_CANDIDATES = [0.0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.2]
+BETA_CANDIDATES = [0.001, 0.01, 0.05, 0.2]
 
 DEPTH = 0
+DEPTH_MODEL = 5
 
 class BayesPlayer:
     def update_opponent_model(self, prev_board: list[list[int]], move: list[int], opponent_model: list[float], evaluate_func):
@@ -39,7 +40,7 @@ class BayesPlayer:
         for i in range(len(BETA_CANDIDATES)):
             beta = BETA_CANDIDATES[i]
             # 特定のβに対する確率分布
-            probabilities:np.ndarray = self.get_moves_probabilities(candidate_moves, prev_board, beta, evaluate_func)
+            probabilities:np.ndarray = self.get_moves_probabilities(candidate_moves, prev_board, beta, evaluate_func, DEPTH_MODEL)
             # 実際に打たれた手の尤度を記録
             likelihood.append(probabilities[move_index])
         
@@ -83,7 +84,7 @@ class BayesPlayer:
             predict = predict + probabilities * confidence_score
         return  predict.tolist()
 
-    def get_moves_probabilities(self, moves:list[list[int]], board:list[list[int]], beta:float, evaluate_func):
+    def get_moves_probabilities(self, moves:list[list[int]], board:list[list[int]], beta:float, evaluate_func, depth = DEPTH):
         """
         相手の強さをβと仮定したときの各手を打ちうる確率
         
@@ -98,13 +99,13 @@ class BayesPlayer:
         mobility = len(moves)
         for move in moves:
             expect_board = OthelloLogic.execute(copy.deepcopy(board), move, -1, len(board))
-            preference = self.get_move_preference(move, expect_board, beta, evaluate_func, mobility) # type: ignore
+            preference = self.get_move_preference(move, expect_board, beta, evaluate_func, mobility, depth) # type: ignore
             preferences.append(preference)
         # softmax関数で確率密度に変換
         probabilities:np.ndarray = softmax(np.array(preferences))
         return probabilities
 
-    def get_move_preference(self, move:list[int], board: list[list[int]], beta: float, evaluate_func, mobility):
+    def get_move_preference(self, move:list[int], board: list[list[int]], beta: float, evaluate_func, mobility, depth = DEPTH):
         """
         ある手に対してその手を打つ可能性
         
@@ -119,7 +120,7 @@ class BayesPlayer:
         a = - math.inf
         b = math.inf
 
-        score = alpha_beta_search.alpha_beta_search(copy.deepcopy(board), DEPTH, a, b, False, -1, evaluate_func)
+        score = alpha_beta_search.alpha_beta_search(copy.deepcopy(board), depth, a, b, False, -1, evaluate_func)
         preference = score * beta
         return preference
 
