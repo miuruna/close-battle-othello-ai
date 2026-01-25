@@ -1,5 +1,6 @@
 # 接戦を演出し最終的に勝利するAI-Othello
 Minimax法を応用したBayes-Even法により評価値を定数に近づけるプログラム
+
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Streamlit](https://img.shields.io/badge/Framework-Streamlit-red?style=for-the-badge&logo=streamlit)
 
 情報システム工学PBLという授業内で作成したオセロAIのソースコードです
