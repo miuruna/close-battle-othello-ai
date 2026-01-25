@@ -6,7 +6,7 @@ Minimax法を応用したBayes-Even法により評価値を定数に近づける
 ベイズ推定を用いて相手の強さを推定しながら指す手を選択します
 
 ## 開発者
-[![Nanako-75-hub](https://img.shields.io/badge/Nanako-75-hub-121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Nanako-75-hub)
+[![Nanako-75-hub](https://img.shields.io/badge/Nanako_75_hub-121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Nanako-75-hub)
 [![nao0106](https://img.shields.io/badge/nao0106-121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nao0106)
 [![miuruna](https://img.shields.io/badge/miuruna-121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/miuruna)
 
