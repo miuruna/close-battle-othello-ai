@@ -15,6 +15,8 @@ Othello Arena用のPythonプログラム: https://github.com/KousukeIshii/Othell
 
 ## [仕様書](docs/SPECIFICATION.md)
 
+[詳細](docs/presentation.pdf)
+
 ## 実行方法
 インストールが必要なライブラリは`requirments.txt`にあるため仮想環境を作成してインストールすること
 
