@@ -14,10 +14,25 @@ def draw_trend_graph(record_list, my_color="black"):
     chart_data = []
     
     for i, row in enumerate(record_list):
+
+        board_raw = row.get('board')
+        
+        # 1. データ自体が存在しない、または空文字の場合はスキップ
+        if not board_raw:
+            print(f"警告: インデックス {i} 手目の board データが空です。スキップします。")
+            continue
+            
+        try:
+            board_list = json.loads(board_raw)
+        except json.JSONDecodeError:
+            # 2. JSONとして壊れている場合もスキップ（原因特定のために中身を表示）
+            st.error(f"JSON解析エラー: {i}手目のデータが不正です -> {board_raw}")
+            continue
+
         board_list = json.loads(row['board'])
         player = 1 if row['turn'] == my_color else -1
         moves = OthelloLogic.getMoves(board_list, player, len(board_list))
-        score = ev.evaluate(board_list, player)
+        score = ev.evaluate(board_list, 1, len(moves) * player)
         chart_data.append({
             "step": i,
             "score": score

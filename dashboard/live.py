@@ -25,7 +25,7 @@ if calculator.is_playing(file_path):
         board_list = json.loads(latest_data['board'])
         player = 1 if latest_data['turn'] == my_color else -1
         moves = OthelloLogic.getMoves(board_list, player, len(board_list))
-        score = evaluator.evaluate(board_list, player) * player
+        score = evaluator.evaluate(board_list, 1, len(moves) * player)
     
     summary_ui.totalization(black, white, rate, score, my_color)
     summary_ui.progress(rate)

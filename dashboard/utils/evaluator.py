@@ -46,9 +46,7 @@ class Evaluator:
         return score
 
 
-    def evaluate(self, board, color):
-        moves = OthelloLogic.getMoves(board, color, len(board))
-        mobility = len(moves)
+    def evaluate(self, board, color, mobility):
         bp = self.calc_board_position(board, color)
         cs = self.calc_confirmed_stones(board, color)
         score = bp * 1 + cs * 10 + mobility * 2

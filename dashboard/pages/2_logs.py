@@ -1,4 +1,5 @@
 import streamlit as st
+from utils import OthelloLogic, evaluator
 from utils import data_loader, calculator
 from widgets import charts, board_ui, summary_ui
 import os
@@ -28,7 +29,11 @@ else:
         with tab1:
             if selected_step is not None:
                 record_data = data_loader.get_record(select_file[0])
+                current_turn = record_data[selected_step]['turn']
                 black, white, rate, share = calculator.count_stones(record_data[selected_step]['board'], my_color)
+                moves = OthelloLogic.getMoves(record_data[selected_step]['board'], 1 if current_turn == my_color else -1, len(record_data[selected_step]['board']))
+                evaluator = evaluator.Evaluator()
+                score = evaluator.evaluate(json.loads(record_data[selected_step]['board']), 1, len(moves) * (1 if current_turn == my_color else -1))
                 summary_ui.totalization(black, white, rate, share, my_color)
                 board_ui.draw_board(record_data[selected_step]['board'], my_color)
             else:
